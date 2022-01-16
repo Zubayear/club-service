@@ -1,0 +1,52 @@
+syntax = "proto3";
+
+package clubservice;
+
+option go_package = "./proto;clubservice";
+
+service ClubService {
+  rpc Save(SaveRequest) returns (SaveResponse) {}
+  rpc Get(GetRequest) returns (GetResponse) {}
+  rpc Update(UpdateRequest) returns (UpdateResponse) {}
+  rpc Delete(DeleteRequest) returns (DeleteResponse) {}
+  rpc GetAll(ClubsRequest) returns (ClubsResponse) {}
+}
+
+message SaveRequest {
+  uint32 id = 1;
+  string name = 2;
+  int32 founded = 3;
+  string leagueName = 4;
+  string manager = 5;
+}
+
+message Club {
+  string name = 1;
+  int32 founded = 2;
+  string leagueName = 3;
+  string manager = 4;
+}
+
+message SaveResponse { Club club = 1; }
+
+message GetRequest { uint32 id = 1; }
+
+message GetResponse { Club club = 1; }
+
+message ClubsRequest {}
+
+message ClubsResponse { repeated Club clubs = 1; }
+
+message DeleteRequest { uint32 id = 1; }
+
+message DeleteResponse { string message = 1;}
+
+message UpdateRequest {
+  uint32 id = 1;
+  string name = 2;
+  int32 founded = 3;
+  string leagueName = 4;
+  string manager = 5;
+}
+
+message UpdateResponse { Club club = 1; }
