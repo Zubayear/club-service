@@ -13,11 +13,15 @@ service ClubService {
 }
 
 message SaveRequest {
-  uint32 id = 1;
-  string name = 2;
-  int32 founded = 3;
-  string leagueName = 4;
-  string manager = 5;
+  string name = 1;
+  int32 founded = 2;
+  string leagueName = 3;
+  string manager = 4;
+  int32 capacity = 5;
+  int32 leaguePosition = 6;
+  int32 timesLeagueWon = 7;
+  int32 lastLeagueWon = 8;
+  string ground = 9;
 }
 
 message Club {
@@ -25,6 +29,11 @@ message Club {
   int32 founded = 2;
   string leagueName = 3;
   string manager = 4;
+  int32 capacity = 5;
+  int32 leaguePosition = 6;
+  int32 timesLeagueWon = 7;
+  int32 lastLeagueWon = 8;
+  string ground = 9;
 }
 
 message SaveResponse { Club club = 1; }
@@ -39,7 +48,7 @@ message ClubsResponse { repeated Club clubs = 1; }
 
 message DeleteRequest { uint32 id = 1; }
 
-message DeleteResponse { string message = 1;}
+message DeleteResponse { string message = 1; }
 
 message UpdateRequest {
   uint32 id = 1;
@@ -47,6 +56,11 @@ message UpdateRequest {
   int32 founded = 3;
   string leagueName = 4;
   string manager = 5;
+  int32 capacity = 6;
+  int32 leaguePosition = 7;
+  int32 timesLeagueWon = 8;
+  int32 lastLeagueWon = 9;
+  string ground = 10;
 }
 
 message UpdateResponse { Club club = 1; }

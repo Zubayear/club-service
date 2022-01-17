@@ -5,6 +5,7 @@ import (
 	pb "club-service/proto"
 	"club-service/repository"
 	"context"
+
 	log "go-micro.dev/v4/logger"
 )
 
@@ -15,94 +16,95 @@ type ClubService struct {
 func (c *ClubService) Save(ctx context.Context, request *pb.SaveRequest, response *pb.SaveResponse) error {
 	log.Infof("Received ClubService.Save request: %v", request)
 	club := &model.Club{
-		Name:       request.GetName(),
-		Founded:    request.GetFounded(),
-		LeagueName: request.GetLeagueName(),
-		Manager:    request.GetManager(),
+		Name:           request.Name,
+		Founded:        request.Founded,
+		LeagueName:     request.LeagueName,
+		Manager:        request.Manager,
+		Capacity:       request.Capacity,
+		Ground:         request.Ground,
+		LeaguePosition: request.LeaguePosition,
+		TimesLeagueWon: request.TimesLeagueWon,
+		LastLeagueWon:  request.LastLeagueWon,
 	}
 	res, err := c.DB.Save(ctx, club)
 	if err != nil {
-		log.Errorf("c.DB.Save() error: %v", err)
 		return err
 	}
-	savedClub := &pb.Club{
-		Name:       res.Name,
-		Founded:    res.Founded,
-		LeagueName: res.LeagueName,
-		Manager:    res.Manager,
-	}
-	response.Club = savedClub
+	savedClubFromDB := res.(*model.Club)
+	clubToReturn := &pb.Club{}
+	response.Club = copyPropDest(savedClubFromDB, clubToReturn)
 	return nil
 }
 
 func (c *ClubService) Get(ctx context.Context, request *pb.GetRequest, response *pb.GetResponse) error {
 	log.Infof("Received ClubService.Get request: %v", request)
-	res, err := c.DB.Get(ctx, int32(request.Id))
+	res, err := c.DB.Get(ctx, uint(request.GetId()))
 	if err != nil {
-		log.Errorf("c.DB.Get() error: %v", err)
 		return err
 	}
-	club := &pb.Club{
-		Name:       res.Name,
-		Founded:    res.Founded,
-		LeagueName: res.LeagueName,
-		Manager:    res.Manager,
-	}
-	response.Club = club
+	clubFromDB := res.(*model.Club)
+	clubToReturn := &pb.Club{}
+	response.Club = copyPropDest(clubFromDB, clubToReturn)
 	return nil
 }
 
 func (c *ClubService) Update(ctx context.Context, request *pb.UpdateRequest, response *pb.UpdateResponse) error {
 	log.Infof("Received ClubService.Update request: %v", request)
-	club := &model.Club{
-		Name:       request.GetName(),
-		Founded:    request.GetFounded(),
-		LeagueName: request.GetLeagueName(),
-		Manager:    request.GetManager(),
+	clubToUpdate := &model.Club{
+		Name:           request.Name,
+		Founded:        request.Founded,
+		LeagueName:     request.LeagueName,
+		Manager:        request.Manager,
+		Capacity:       request.Capacity,
+		LeaguePosition: request.LeaguePosition,
+		TimesLeagueWon: request.TimesLeagueWon,
+		LastLeagueWon:  request.LastLeagueWon,
+		Ground:         request.Ground,
 	}
-	res, err := c.DB.Update(ctx, club, int64(request.Id))
+	res, err := c.DB.Update(ctx, clubToUpdate, uint(request.GetId()))
 	if err != nil {
-		log.Errorf("c.DB.Update() error: %v", err)
 		return err
 	}
-	updatedClub := &pb.Club{
-		Name:       res.Name,
-		Founded:    res.Founded,
-		LeagueName: res.LeagueName,
-		Manager:    res.Manager,
-	}
-	response.Club = updatedClub
+	updatedClubFromDB := res.(*model.Club)
+	clubToReturn := &pb.Club{}
+	response.Club = copyPropDest(updatedClubFromDB, clubToReturn)
 	return nil
 }
 
 func (c *ClubService) Delete(ctx context.Context, request *pb.DeleteRequest, response *pb.DeleteResponse) error {
 	log.Infof("Received ClubService.Delete request: %v", request)
-	s, err := c.DB.Delete(ctx, int64(request.Id))
+	err := c.DB.Delete(ctx, uint(request.GetId()))
 	if err != nil {
-		log.Errorf("c.DB.Delete error: %v", err)
 		return err
 	}
-	response.Message = s
 	return nil
 }
 
 func (c *ClubService) GetAll(ctx context.Context, request *pb.ClubsRequest, response *pb.ClubsResponse) error {
 	log.Infof("Received ClubService.GetAll request: %v", request)
-	clubs, err := c.DB.GetAll(ctx)
+	clubsFromDB, err := c.DB.GetAll(ctx)
 	if err != nil {
-		log.Errorf("Business layer GetAll error: %v", err)
 		return err
 	}
+	clubsToReturn := clubsFromDB.([]*model.Club)
 	var clubsResponse []*pb.Club
-	for _, v := range clubs {
-		club := &pb.Club{
-			Name:       v.Name,
-			Founded:    v.Founded,
-			LeagueName: v.LeagueName,
-			Manager:    v.Manager,
-		}
-		clubsResponse = append(clubsResponse, club)
+	for _, v := range clubsToReturn {
+		club := &pb.Club{}
+		clubsResponse = append(clubsResponse, copyPropDest(v, club))
 	}
 	response.Clubs = clubsResponse
 	return nil
+}
+
+func copyPropDest(src *model.Club, dst *pb.Club) *pb.Club {
+	dst.Name = src.Name
+	dst.Founded = src.Founded
+	dst.LeagueName = src.LeagueName
+	dst.Manager = src.Manager
+	dst.Capacity = src.Capacity
+	dst.LeaguePosition = src.LeaguePosition
+	dst.TimesLeagueWon = src.TimesLeagueWon
+	dst.LastLeagueWon = src.LastLeagueWon
+	dst.Ground = src.Ground
+	return dst
 }

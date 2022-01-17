@@ -3,70 +3,82 @@ package repository
 import (
 	"club-service/model"
 	"context"
+
 	log "go-micro.dev/v4/logger"
 
 	"gorm.io/gorm"
 )
 
 type IRepository interface {
-	Get(ctx context.Context, id int32) (*model.Club, error)
-	Save(ctx context.Context, club *model.Club) (*model.Club, error)
-	Update(ctx context.Context, club *model.Club, id int64) (*model.Club, error)
-	FindByField(context.Context, string, string, string) (*model.Club, error)
-	Delete(ctx context.Context, id int64) (string, error)
-	GetAll(ctx context.Context) ([]*model.Club, error)
+	Get(ctx context.Context, id interface{}) (interface{}, error)
+	Save(ctx context.Context, club interface{}) (interface{}, error)
+	Update(ctx context.Context, club interface{}, id interface{}) (interface{}, error)
+	Delete(ctx context.Context, id interface{}) error
+	GetAll(ctx context.Context) (interface{}, error)
 }
 
-func (c *Club) Get(_ context.Context, id int32) (*model.Club, error) {
-	club := &model.Club{}
-	c.Db.First(club, id)
-	return club, nil
-}
-
-func (c *Club) Save(_ context.Context, club *model.Club) (*model.Club, error) {
-	err := c.Db.Create(club).Error
+func (c *Club) Get(_ context.Context, id interface{}) (interface{}, error) {
+	dbID := id.(uint)
+	var club *model.Club
+	err := c.Db.First(&club, dbID).Error
 	if err != nil {
-		log.Errorf("c.DB.Create().Error error: %v", err)
+		log.Errorf("Entity retrieve from DB error: %v", err)
 		return nil, err
 	}
 	return club, nil
 }
 
-func (c *Club) Update(_ context.Context, club *model.Club, id int64) (*model.Club, error) {
-	updateClub := &model.Club{}
-	c.Db.First(updateClub, id)
-	updateClub.Founded = club.Founded
-	updateClub.Name = club.Name
-	updateClub.LeagueName = club.LeagueName
-	updateClub.Manager = club.Manager
-	c.Db.Save(updateClub)
-	return updateClub, nil
-}
-
-func (c *Club) FindByField(_ context.Context, s string, s2 string, s3 string) (*model.Club, error) {
-	if len(s3) == 0 {
-		s3 = "*"
-	}
-	club := &model.Club{}
-	if err := c.Db.Select(s3).Where(s+" = ?", s2).First(club).Error; err != nil {
+func (c *Club) Save(_ context.Context, club interface{}) (interface{}, error) {
+	clubToSave := club.(*model.Club)
+	err := c.Db.Create(&clubToSave).Error
+	if err != nil {
+		log.Errorf("Entity save in DB error: %v", err)
 		return nil, err
 	}
-	return club, nil
+	return clubToSave, nil
 }
 
-func (c *Club) Delete(_ context.Context, id int64) (string, error) {
-	err := c.Db.Unscoped().Delete(&model.Club{}, id).Error
+func (c *Club) Update(ctx context.Context, club interface{}, id interface{}) (interface{}, error) {
+	dbID := id.(uint)
+	clubToUpdate := club.(*model.Club)
+	var updatedClub *model.Club
+	err := c.Db.First(&updatedClub, dbID).Error
 	if err != nil {
-		return "Sorry but couldn't delete this entry", err
+		log.Errorf("Entity retrieve from DB error: %v", err)
+		return nil, err
 	}
-	return "Entry deleted permanently", nil
+	updatedClub.Founded = clubToUpdate.Founded
+	updatedClub.Name = clubToUpdate.Name
+	updatedClub.LeagueName = clubToUpdate.LeagueName
+	updatedClub.Manager = clubToUpdate.Manager
+	updatedClub.Capacity = clubToUpdate.Capacity
+	updatedClub.Ground = clubToUpdate.Ground
+	updatedClub.LeaguePosition = clubToUpdate.LeaguePosition
+	updatedClub.TimesLeagueWon = clubToUpdate.TimesLeagueWon
+	updatedClub.LastLeagueWon = clubToUpdate.LastLeagueWon
+	err = c.Db.Save(&updatedClub).Error
+	if err != nil {
+		log.Errorf("Updated entity save in DB error: %v", err)
+		return nil, err
+	}
+	return updatedClub, nil
 }
 
-func (c *Club) GetAll(ctx context.Context) ([]*model.Club, error) {
+func (c *Club) Delete(_ context.Context, id interface{}) error {
+	dbID := id.(uint)
+	err := c.Db.Unscoped().Delete(&model.Club{}, dbID).Error
+	if err != nil {
+		log.Errorf("Entity delete in DB error: %v", err)
+		return err
+	}
+	return nil
+}
+
+func (c *Club) GetAll(ctx context.Context) (interface{}, error) {
 	var clubs []*model.Club
 	err := c.Db.Find(&clubs).Error
 	if err != nil {
-		log.Errorf("DB Find error: %v", err)
+		log.Errorf("Entites retrieve from DB error: %v", err)
 		return nil, err
 	}
 	return clubs, nil

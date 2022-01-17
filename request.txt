@@ -1,0 +1,26 @@
+SAVE - micro call club-service ClubService.Update '{
+  "name": "Liverpool F.C.",
+  "founded": "1892",
+  "manager": "Jürgen Klopp",
+  "leagueName": "Premier League",
+  "capacity": "53394",
+  "ground": "Anfield",
+  "leaguePosition": "2",
+  "timesLeagueWon": "19",
+  "lastLeagueWon": "2019"
+}'
+GET - micro call club-service ClubService.Get '{"id": "1"}'
+UPDATE - micro call club-service ClubService.Update '{
+  "name": "Liverpool F.C.",
+  "founded": "1892",
+  "manager": "Jürgen Klopp",
+  "leagueName": "Premier League",
+  "capacity": "53394",
+  "ground": "Anfield",
+  "leaguePosition": "2",
+  "timesLeagueWon": "19",
+  "lastLeagueWon": "2019",
+  "id": "1"
+}'
+GETALL - micro call club-service ClubService.GetAll
+DELETE - micro call club-service ClubService.Delete '{"id": "1"}'
