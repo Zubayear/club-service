@@ -1,13 +1,13 @@
-SAVE - micro call club-service ClubService.Update '{
-  "name": "Liverpool F.C.",
-  "founded": "1892",
-  "manager": "Jürgen Klopp",
+SAVE - micro call club-service ClubService.Save '{
+  "name": "Arsenal F.C.",
+  "founded": "1886",
+  "manager": "Mikel Arteta",
   "leagueName": "Premier League",
-  "capacity": "53394",
-  "ground": "Anfield",
-  "leaguePosition": "2",
-  "timesLeagueWon": "19",
-  "lastLeagueWon": "2019"
+  "capacity": "60704",
+  "ground": "Emirates Stadium",
+  "leaguePosition": "5",
+  "timesLeagueWon": "13",
+  "lastLeagueWon": "2003"
 }'
 GET - micro call club-service ClubService.Get '{"id": "1"}'
 UPDATE - micro call club-service ClubService.Update '{
