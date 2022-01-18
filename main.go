@@ -5,6 +5,7 @@ import (
 	"club-service/model"
 	pb "club-service/proto"
 	"club-service/repository"
+
 	"gorm.io/gorm"
 
 	"go-micro.dev/v4"
@@ -33,10 +34,20 @@ func main() {
 	// Register handler
 	pb.RegisterClubServiceHandler(srv.Server(), clubService)
 
+	// p := players.NewPlayersService("players", client.NewClient())
+
+	// rsp, err := p.Get(context.TODO(), &players.PlayerRequest{
+	// 	Id: "61e2ebe89f5bed7251ddf3f3",
+	// })
+	// if err != nil {
+	// 	log.Errorf("Client call error: %v", err)
+	// }
+	// fmt.Println("response", rsp.Player)
 	// Run service
 	if err := srv.Run(); err != nil {
 		log.Fatal(err)
 	}
+
 }
 
 func setUpDB() repository.IRepository {

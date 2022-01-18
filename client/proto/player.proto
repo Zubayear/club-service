@@ -1,0 +1,29 @@
+syntax = "proto3";
+
+package players;
+
+option go_package = "club-service/client/proto;players";
+
+service Players {
+  rpc Get(PlayerRequest) returns (PlayerResponse) {}
+}
+
+enum Postiton {
+  DEFAULT = 0;
+  MIDFIELD = 1;
+  FORWARD = 2;
+  DEFENDER = 3;
+}
+
+message PlayerResponse { Player player = 1; }
+
+message Player {
+  reserved 1;
+  reserved "id";
+  string name = 2;
+  Postiton position = 3;
+  string clubName = 4;
+  int32 age = 5;
+}
+
+message PlayerRequest { string id = 1; }

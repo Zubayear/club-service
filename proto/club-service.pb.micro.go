@@ -4,6 +4,7 @@
 package clubservice
 
 import (
+	_ "club-service/client/proto"
 	fmt "fmt"
 	proto "google.golang.org/protobuf/proto"
 	math "math"

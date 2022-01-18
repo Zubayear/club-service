@@ -1,0 +1,20 @@
+version: '3'
+
+services:
+  mysql:
+    image: 'mysql:latest'
+    ports:
+      - 9910:3306
+    environment:
+      - MYSQL_DATABASE=clubdb
+      - MYSQL_USER=root
+      - MYSQL_PASSWORD=root
+      - MYSQL_RANDOM_ROOT_PASSWORD="yes"
+    volumes:
+      - ./mysql-data:/var/lib/mysql
+  club-service:
+    container_name: club-service
+    build:
+      context: .
+    depends_on:
+      - mysql

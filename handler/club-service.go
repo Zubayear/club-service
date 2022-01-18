@@ -1,11 +1,14 @@
 package handler
 
 import (
+	players "club-service/client/proto"
 	"club-service/model"
 	pb "club-service/proto"
 	"club-service/repository"
 	"context"
+	"fmt"
 
+	"go-micro.dev/v4/client"
 	log "go-micro.dev/v4/logger"
 )
 
@@ -44,7 +47,19 @@ func (c *ClubService) Get(ctx context.Context, request *pb.GetRequest, response 
 	}
 	clubFromDB := res.(*model.Club)
 	clubToReturn := &pb.Club{}
-	response.Club = copyPropDest(clubFromDB, clubToReturn)
+	value := copyPropDest(clubFromDB, clubToReturn)
+
+	p := players.NewPlayersService("players", client.DefaultClient)
+
+	rsp, err := p.Get(context.TODO(), &players.PlayerRequest{
+		Id: "61e2ebe89f5bed7251ddf3f3",
+	})
+	if err != nil {
+		log.Errorf("Client call error: %v", err)
+	}
+	fmt.Println("response", rsp.Player)
+	value.Player = rsp.Player
+	response.Club = value
 	return nil
 }
 
