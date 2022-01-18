@@ -1,13 +1,14 @@
 package handler
 
 import (
+	players "club-service/client"
 	"club-service/model"
 	pb "club-service/proto"
 	"club-service/repository"
 	"context"
-	mapper "gopkg.in/jeevatkm/go-model.v1"
-
+	"go-micro.dev/v4/client"
 	log "go-micro.dev/v4/logger"
+	mapper "gopkg.in/jeevatkm/go-model.v1"
 )
 
 type ClubService struct {
@@ -45,19 +46,16 @@ func (c *ClubService) Get(ctx context.Context, request *pb.GetRequest, response 
 	}
 	clubFromDB := res.(*model.Club)
 	clubToReturn := &pb.Club{}
-	//value := copyPropDest(clubFromDB, clubToReturn)
 	mapper.Copy(clubToReturn, clubFromDB)
 
-	//p := players.NewPlayersService("players", client.DefaultClient)
-
-	//rsp, err := p.Get(context.TODO(), &players.PlayerRequest{
-	//	Id: "61e2ebe89f5bed7251ddf3f3",
-	//})
-	//if err != nil {
-	//	log.Errorf("Client call error: %v", err)
-	//}
-	//fmt.Println("response", rsp.Player)
-	//clubToReturn.Player = rsp.Player
+	client := players.NewPlayersService("players", client.DefaultClient)
+	playersOfClub, err := client.Filter(context.Background(), &players.GetRequest{Name: clubToReturn.Name})
+	if err != nil {
+		log.Errorf("Players retrieve from service error: %v", err)
+		return err
+	}
+	getResponse := &players.GetResponse{Players: playersOfClub.Players}
+	clubToReturn.Players = getResponse
 	response.Club = clubToReturn
 	return nil
 }

@@ -1,4 +1,4 @@
 #!/bin/bash
-echo 'generating'
+echo 'generating stub from proto file'
 
-`protoc --proto_path=. --micro_out=./client/ --go_out=:./client/ client/proto/player.proto`
+`protoc --proto_path=. --micro_out=. --go_out=:. client/player.proto`

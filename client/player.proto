@@ -1,0 +1,34 @@
+syntax = "proto3";
+
+package players;
+
+// generated code will be placed inside client/proto/
+option go_package = "/client;players";
+
+service Players {
+  rpc Filter(GetRequest) returns (GetResponse) {}
+}
+
+enum Position {
+  DEFAULT = 0;
+  MIDFIELD = 1;
+  FORWARD = 2;
+  DEFENDER = 3;
+}
+
+message Player {
+  reserved 1;
+  reserved "id";
+  string name = 2;
+  Position position = 3;
+  string clubName = 4;
+  int32 age = 5;
+}
+
+message GetRequest {
+  string name = 1;
+}
+
+message GetResponse {
+  repeated Player players = 1;
+}

@@ -1,7 +1,7 @@
 syntax = "proto3";
 
 package clubservice;
-import "client/proto/player.proto";
+import "client/player.proto";
 
 option go_package = "./proto;clubservice";
 
@@ -35,7 +35,7 @@ message Club {
   int32 timesLeagueWon = 7;
   int32 lastLeagueWon = 8;
   string ground = 9;
-  players.Player player = 10;
+  players.GetResponse players = 10;
 }
 
 message SaveResponse { Club club = 1; }
