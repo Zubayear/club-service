@@ -4,8 +4,10 @@ import (
 	"club-service/handler"
 	"club-service/model"
 	pb "club-service/proto"
+	"club-service/pubsub"
 	"club-service/repository"
 	"fmt"
+
 	"github.com/asim/go-micro/plugins/config/encoder/yaml/v4"
 	"go-micro.dev/v4/config"
 	"go-micro.dev/v4/config/reader"
@@ -39,6 +41,9 @@ func main() {
 
 	// Register handler
 	pb.RegisterClubServiceHandler(srv.Server(), clubService)
+
+	// Register subscriber
+	micro.RegisterSubscriber("club.topic.pubsub.1", srv.Server(), new(pubsub.Sub))
 
 	// Run service
 	if err := srv.Run(); err != nil {
